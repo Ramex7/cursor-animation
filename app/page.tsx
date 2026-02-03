@@ -24,7 +24,7 @@ const page: React.FC = () => {
               </h1>
             </div>
             <a
-              href="https://github.com"
+              href="https://github.com/Ramex7/cursor-animation.git"
               className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-sm font-medium transition-colors border border-zinc-700"
             >
               View on GitHub
