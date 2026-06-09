@@ -2,22 +2,21 @@
 import { useRef, useCallback } from 'react';
 import { useCanvasCursor } from '@/hooks/useCanvasCursor';
 
-interface FairyDustCursorProps {
+interface SparkleTrailProps {
   containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-interface Particle {
+interface Sparkle {
   x: number; y: number;
   vx: number; vy: number;
-  char: string; color: string;
   life: number; size: number;
+  color: string;
 }
 
-const CHARS = ['✨', '⭐', '🌟', '★', '*'];
-const COLORS = ['#D61C59', '#E7D84B', '#1B8798', '#FF6B6B', '#4ECDC4'];
+const COLORS = ['#fbbf24', '#f472b6', '#22d3ee', '#a78bfa', '#34d399', '#fb923c'];
 
-export const FairyDustCursor: React.FC<FairyDustCursorProps> = ({ containerRef }) => {
-  const particlesRef = useRef<Particle[]>([]);
+export const SparkleTrail: React.FC<SparkleTrailProps> = ({ containerRef }) => {
+  const particlesRef = useRef<Sparkle[]>([]);
 
   const draw = useCallback((ctx: CanvasRenderingContext2D, { x, y }: { x: number; y: number }) => {
     const particles = particlesRef.current;
@@ -26,28 +25,28 @@ export const FairyDustCursor: React.FC<FairyDustCursorProps> = ({ containerRef }
 
     particles.push({
       x, y,
-      vx: (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 1.5 + 0.3),
-      vy: -(Math.random() * 2 + 0.5),
-      char: CHARS[Math.floor(Math.random() * CHARS.length)],
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
       life: 1,
-      size: Math.random() * 12 + 14,
+      size: Math.random() * 3 + 1.5,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
     });
 
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.03;
-      p.life -= 0.018;
+      p.life -= 0.025;
       if (p.life <= 0) { particles.splice(i, 1); continue; }
+
       ctx.save();
-      ctx.globalAlpha = p.life;
-      ctx.font = `${p.size * p.life * 0.8 + 4}px serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.globalAlpha = p.life * 0.8;
       ctx.fillStyle = p.color;
-      ctx.fillText(p.char, p.x, p.y);
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     }
   }, []);

@@ -7,24 +7,21 @@ interface CanvasCursorOptions {
   className?: string;
 }
 
-interface CanvasCursorReturn {
-  canvasRef: React.RefObject<HTMLCanvasElement | null>;
-}
-
 export function useCanvasCursor(
   draw: (ctx: CanvasRenderingContext2D, state: { x: number; y: number; time: number; width: number; height: number }) => void,
   options: CanvasCursorOptions = {}
-): CanvasCursorReturn {
+) {
   const { containerRef, zIndex = 9999, className = '' } = options;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const posRef = useRef({ x: 0, y: 0 });
   const rafRef = useRef<number>(0);
-  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const drawRef = useRef(draw);
+  const mountedRef = useRef(true);
 
-  const resize = useCallback(() => {
+  const setup = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
     const wrapper = containerRef?.current;
     const dpr = window.devicePixelRatio || 1;
     const w = wrapper ? wrapper.clientWidth : window.innerWidth;
@@ -33,11 +30,7 @@ export function useCanvasCursor(
     canvas.height = h * dpr;
     canvas.style.width = `${w}px`;
     canvas.style.height = `${h}px`;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.scale(dpr, dpr);
-      ctxRef.current = ctx;
-    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }, [containerRef]);
 
   useEffect(() => {
@@ -60,7 +53,7 @@ export function useCanvasCursor(
     const target = wrapper || document.body;
     target.appendChild(canvas);
     canvasRef.current = canvas;
-    resize();
+    setup();
 
     const onMove = (e: MouseEvent | Touch) => {
       if (wrapper) {
@@ -79,29 +72,36 @@ export function useCanvasCursor(
     };
 
     const animate = (time: number) => {
-      const ctx = ctxRef.current;
-      const cvs = canvasRef.current;
-      if (!ctx || !cvs) return;
+      if (!mountedRef.current) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
       const wr = containerRef?.current;
       const w = wr ? wr.clientWidth : window.innerWidth;
       const h = wr ? wr.clientHeight : window.innerHeight;
-      drawRef.current(ctx, { x: posRef.current.x, y: posRef.current.y, time, width: w, height: h });
+      drawRef.current(ctx, {
+        x: posRef.current.x,
+        y: posRef.current.y,
+        time,
+        width: w,
+        height: h,
+      });
       rafRef.current = requestAnimationFrame(animate);
     };
 
     target.addEventListener('mousemove', onMouseMove);
     target.addEventListener('touchmove', onTouchMove, { passive: true });
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', setup);
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
+      mountedRef.current = false;
       cancelAnimationFrame(rafRef.current);
       target.removeEventListener('mousemove', onMouseMove);
       target.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('resize', resize);
+      window.removeEventListener('resize', setup);
       canvas.remove();
     };
-  }, [containerRef, zIndex, className, resize]);
+  }, [containerRef, zIndex, className, setup]);
 
   return { canvasRef };
 }

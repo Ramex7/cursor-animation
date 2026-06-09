@@ -1,259 +1,255 @@
 'use client'
 import React, { useState, useRef, useMemo } from 'react';
-import { ThemeToggle, SearchBar, ComponentCard } from '@/components/Ui';
+import { Header, SearchBar, ComponentCard } from '@/components/Ui';
 import { components } from '@/data/data';
 import { categories } from '@/data/categories';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiGithub, FiStar, FiGrid, FiLayers, FiMousePointer, FiDroplet } from 'react-icons/fi';
+import {
+  FiGrid, FiLayers, FiMousePointer, FiDroplet,
+  FiArrowDown, FiGithub, FiStar,
+} from 'react-icons/fi';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.04 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
+};
+
+const statVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { delay: 0.4 + i * 0.1, duration: 0.5, ease: "easeOut" as const },
+  }),
+};
 
 const Page: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCursor, setActiveCursor] = useState<string | null>(null);
-  const liveDemoRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLElement>(null);
 
   const filteredComponents = useMemo(() => {
     return components.filter((c) => {
       const matchCategory = selectedCategory === 'all' || c.category === selectedCategory;
-      const matchSearch = !searchQuery || 
+      const matchSearch = !searchQuery ||
         c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.description.toLowerCase().includes(searchQuery.toLowerCase());
       return matchCategory && matchSearch;
     });
   }, [selectedCategory, searchQuery]);
 
-  const activeComponent = useMemo(
-    () => components.find((c) => c.id === activeCursor),
-    [activeCursor]
-  );
-
   const stats = useMemo(() => ({
     total: components.length,
     categories: categories.length - 1,
     canvas: components.filter((c) => c.category === 'canvas').length,
-    interactive: components.filter((c) => c.category === 'interactive').length,
+    interactive: components.filter((c) => c.category === 'interactive' || c.category === 'basic').length,
   }), []);
+
+  const scrollToGallery = () => {
+    galleryRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      {/* Animated Background */}
+      {/* Background Effects */}
       <div className="fixed inset-0 pointer-events-none -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(251,191,36,0.06)_0%,_transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(139,92,246,0.04)_0%,_transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(245,158,11,0.05)_0%,_transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(139,92,246,0.03)_0%,_transparent_50%)]" />
+        <motion.div
+          className="absolute inset-0 opacity-[0.02]"
+          animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, rgb(255 255 255) 1px, transparent 0)`,
+            backgroundSize: '32px 32px',
+          }}
+        />
       </div>
 
-      {/* Header */}
-      <header className="border-b border-zinc-800 bg-zinc-900/60 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                <span className="text-zinc-900 font-bold text-sm">NC</span>
-              </div>
-              <div>
-                <h1 className="text-lg font-bold tracking-tight">
-                  Nice <span className="text-amber-400">Cursor</span>
-                </h1>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <a
-                href="https://github.com/Ramex7/cursor-animation.git"
-                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg text-sm font-medium transition-colors border border-zinc-700"
-              >
-                <FiGithub size={16} />
-                <span>GitHub</span>
-              </a>
-              <ThemeToggle />
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
-      <main className="relative">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden border-b border-zinc-800">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" 
-              style={{
-                backgroundImage: `radial-gradient(circle at 1px 1px, rgb(255 255 255) 1px, transparent 0)`,
-                backgroundSize: '24px 24px',
-              }} 
-            />
-          </div>
-          <div className="max-w-7xl mx-auto px-6 py-20 md:py-28 relative">
+      <main className="relative pt-16">
+        {/* Hero */}
+        <section className="relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20 relative">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center max-w-3xl mx-auto"
+              transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="text-center max-w-4xl mx-auto"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium mb-6">
-                <FiMousePointer size={14} />
-                <span>{components.length} Interactive Cursors</span>
-              </div>
-              <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-                The{' '}
-                <span className="bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent">
-                  Ultimate
-                </span>{' '}
-                <br className="sm:hidden" />
-                Cursor Animation Library
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/8 border border-amber-500/15 text-amber-400/90 text-sm font-medium mb-6"
+              >
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <FiMousePointer size={14} />
+                </motion.div>
+                <span>{components.length} Reusable Components &middot; Copy-Paste Ready</span>
+              </motion.div>
+
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-5 leading-[1.1]">
+                <span className="text-zinc-100">Cursor</span>{' '}
+                <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-pulse-glow">
+                  Animations
+                </span>
+                <br />
+                <span className="text-zinc-400">for React &amp; Next.js</span>
               </h1>
-              <p className="text-lg text-zinc-400 max-w-xl mx-auto mb-8 leading-relaxed">
-                A beautiful collection of interactive cursor effects built with React,
-                Framer Motion, and TypeScript. Hover, click, and explore.
+
+              <p className="text-lg text-zinc-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+                A production-ready collection of {components.length} cursor effects — smooth followers, trails,
+                canvas particles, ripples, and more. Built with Framer Motion &amp; TypeScript.
               </p>
-              <div className="flex items-center justify-center gap-4">
-                <a
-                  href="#gallery"
-                  className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-900 font-semibold rounded-xl transition-colors"
+
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+                <motion.button
+                  onClick={scrollToGallery}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-900 font-semibold rounded-xl transition-colors shadow-lg shadow-amber-500/20"
                 >
                   Browse Components
-                </a>
-                <a
+                </motion.button>
+                <motion.a
                   href="https://github.com/Ramex7/cursor-animation.git"
-                  className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium rounded-xl transition-colors border border-zinc-700 flex items-center gap-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="px-6 py-3 bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 font-medium rounded-xl transition-all border border-zinc-700/50 hover:border-zinc-600 flex items-center gap-2"
                 >
                   <FiStar size={16} />
                   Star on GitHub
-                </a>
+                </motion.a>
               </div>
+            </motion.div>
+
+            {/* Stats */}
+            <div className="mt-16 max-w-2xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { icon: FiGrid, label: 'Components', value: stats.total },
+                  { icon: FiLayers, label: 'Categories', value: stats.categories },
+                  { icon: FiDroplet, label: 'Canvas FX', value: stats.canvas },
+                  { icon: FiMousePointer, label: 'Interactive', value: stats.interactive },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    custom={i}
+                    initial="hidden"
+                    animate="visible"
+                    variants={statVariants}
+                    whileHover={{ y: -4, borderColor: 'rgba(251,191,36,0.2)' }}
+                    className="text-center p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/50 transition-colors"
+                  >
+                    <stat.icon className="mx-auto mb-1.5 text-zinc-600" size={16} />
+                    <div className="text-xl font-bold text-zinc-100">{stat.value}</div>
+                    <div className="text-[10px] text-zinc-600 uppercase tracking-widest mt-0.5">{stat.label}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Scroll indicator */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2, duration: 0.8 }}
+              className="flex justify-center mt-12"
+            >
+              <motion.button
+                onClick={scrollToGallery}
+                animate={{ y: [0, 8, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="text-zinc-600 hover:text-zinc-400 transition-colors"
+              >
+                <FiArrowDown size={20} />
+              </motion.button>
             </motion.div>
           </div>
         </section>
 
-        {/* Stats Bar */}
-        <section className="border-b border-zinc-800">
-          <div className="max-w-7xl mx-auto px-6 py-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[
-                { icon: FiGrid, label: 'Components', value: stats.total },
-                { icon: FiLayers, label: 'Categories', value: stats.categories },
-                { icon: FiDroplet, label: 'Canvas Effects', value: stats.canvas },
-                { icon: FiMousePointer, label: 'Interactive', value: stats.interactive },
-              ].map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="text-center"
-                >
-                  <stat.icon className="mx-auto mb-2 text-zinc-500" size={20} />
-                  <div className="text-2xl font-bold text-zinc-100">{stat.value}</div>
-                  <div className="text-xs text-zinc-500 uppercase tracking-wider mt-0.5">{stat.label}</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Live Cursor Demo */}
-        <section className="border-b border-zinc-800 bg-zinc-900/30">
-          <div className="max-w-7xl mx-auto px-6 py-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-lg font-bold">Try It Live</h2>
-                <p className="text-sm text-zinc-500">Click a cursor to apply it on this section</p>
-              </div>
-              {activeCursor && (
-                <button
-                  onClick={() => setActiveCursor(null)}
-                  className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-                >
-                  Reset
-                </button>
-              )}
-            </div>
-            <div
-              ref={liveDemoRef}
-              className="relative h-48 rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 border border-zinc-800 overflow-hidden flex items-center justify-center"
-            >
-              {activeComponent && (
-                <activeComponent.CursorComponent containerRef={liveDemoRef} />
-              )}
-              <div className="text-center z-10">
-                <p className="text-zinc-500 text-sm mb-2">
-                  {activeCursor ? `✨ ${activeComponent?.title} active` : 'Select a cursor below'}
-                </p>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="inline-block px-8 py-4 bg-zinc-800/80 rounded-xl border border-zinc-700/50 cursor-pointer backdrop-blur-sm"
-                  data-magnetic
-                >
-                  <span className="text-zinc-200 font-medium">Interactive Zone</span>
-                </motion.div>
-              </div>
-            </div>
-            <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-none">
-              {components.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setActiveCursor(c.id)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
-                    activeCursor === c.id
-                      ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
-                      : 'bg-zinc-800/50 border-zinc-700/50 text-zinc-400 hover:text-zinc-200 hover:border-zinc-600'
-                  }`}
-                >
-                  {c.title}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* Gallery */}
-        <section id="gallery" className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <section id="gallery" ref={galleryRef} className="max-w-7xl mx-auto px-6 py-12 scroll-mt-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8"
+          >
             <div>
-              <h2 className="text-2xl font-bold">Component Gallery</h2>
+              <h2 className="text-2xl font-bold">All Components</h2>
               <p className="text-zinc-500 text-sm mt-1">
                 {filteredComponents.length} of {components.length} components
               </p>
             </div>
-            <div className="w-full md:w-72">
+            <div className="w-full md:w-64">
               <SearchBar value={searchQuery} onChange={setSearchQuery} />
             </div>
-          </div>
+          </motion.div>
 
-          {/* Category Filters */}
-          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-none">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-none"
+          >
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
                   selectedCategory === cat.id
-                    ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
-                    : 'bg-zinc-800/30 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+                    ? 'bg-amber-500/15 border-amber-500/30 text-amber-400'
+                    : 'bg-zinc-800/20 border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'
                 }`}
               >
                 {cat.label}
               </button>
             ))}
-          </div>
+          </motion.div>
 
-          {/* Component Grid */}
           <AnimatePresence mode="wait">
             {filteredComponents.length > 0 ? (
               <motion.div
                 key={selectedCategory + searchQuery}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                className="grid grid-cols-1 lg:grid-cols-2 gap-5"
               >
                 {filteredComponents.map((component) => (
-                  <ComponentCard
-                    key={component.id}
-                    title={component.title}
-                    description={component.description}
-                    category={component.category}
-                    CursorComponent={component.CursorComponent}
-                    code={component.code}
-                  />
+                  <motion.div key={component.id} variants={itemVariants}>
+                    <ComponentCard
+                      title={component.title}
+                      description={component.description}
+                      category={component.category}
+                      CursorComponent={component.CursorComponent}
+                      code={component.code}
+                    />
+                  </motion.div>
                 ))}
               </motion.div>
             ) : (
@@ -262,8 +258,8 @@ const Page: React.FC = () => {
                 animate={{ opacity: 1 }}
                 className="text-center py-24"
               >
-                <p className="text-zinc-500 text-lg">No components found</p>
-                <p className="text-zinc-600 text-sm mt-1">Try a different search or category</p>
+                <p className="text-zinc-600 text-lg">No components found</p>
+                <p className="text-zinc-700 text-sm mt-1">Try a different search or category</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -271,32 +267,39 @@ const Page: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800 mt-12">
+      <motion.footer
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className="border-t border-zinc-800/50 mt-8"
+      >
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                <span className="text-zinc-900 font-bold text-[10px]">NC</span>
+                <span className="text-zinc-900 font-bold text-[10px]">CL</span>
               </div>
-              <p className="text-sm text-zinc-500">
-                Built with Next.js, TypeScript, and Framer Motion
+              <p className="text-sm text-zinc-600">
+                Built with Next.js, Framer Motion &amp; TypeScript
               </p>
             </div>
-            <p className="text-sm text-zinc-600">
-              &copy; {new Date().getFullYear()} Nice Cursor. Inspired by{' '}
-              <a
-                href="https://cursify.ui-layouts.com/"
+            <div className="flex items-center gap-4">
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                href="https://github.com/Ramex7/cursor-animation.git"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-500 hover:text-zinc-300 underline underline-offset-2"
+                className="flex items-center gap-1.5 text-sm text-zinc-600 hover:text-zinc-400 transition-colors"
               >
-                Cursify
-              </a>
-              .
-            </p>
+                <FiGithub size={14} /> GitHub
+              </motion.a>
+              <span className="text-zinc-700 text-sm">
+                &copy; {new Date().getFullYear()} Cursor Lab
+              </span>
+            </div>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 };

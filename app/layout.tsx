@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nice Cursor - Interactive Cursor Animation Library",
+  title: "Cursor Lab - Reusable Cursor Animations for React & Next.js",
   description:
-    "A collection of interactive cursor animations and effects built with React, Next.js, Framer Motion, and TypeScript. Smooth followers, trails, ripples, and more.",
+    "A production-ready collection of 12+ interactive cursor animations and effects built with React, Next.js, Framer Motion, and TypeScript. Smooth followers, trails, ripples, canvas effects, and more. Copy-paste ready components with live preview.",
   keywords: [
     "cursor animation",
     "react cursor",
@@ -23,12 +23,14 @@ export const metadata: Metadata = {
     "custom cursor",
     "cursor effects",
     "next.js cursor",
+    "tailwind cursor",
+    "reusable cursor components",
   ],
   authors: [{ name: "Ramex" }],
   openGraph: {
-    title: "Nice Cursor - Interactive Cursor Animation Library",
+    title: "Cursor Lab - Reusable Cursor Animations",
     description:
-      "A collection of interactive cursor animations and effects built with React, Next.js, and Framer Motion.",
+      "A production-ready collection of 12+ interactive cursor animations built with React, Next.js, and Framer Motion. Copy-paste ready.",
     type: "website",
   },
 };
@@ -40,22 +42,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                const theme = localStorage.getItem('theme');
-                if (theme === 'light') {
-                  document.documentElement.classList.remove('dark');
-                } else {
-                  document.documentElement.classList.add('dark');
-                }
-              } catch(e) {}
-            `,
-          }}
-        />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

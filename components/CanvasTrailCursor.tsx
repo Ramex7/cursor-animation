@@ -1,5 +1,5 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import { useCanvasCursor } from '@/hooks/useCanvasCursor';
 
 interface CanvasTrailCursorProps {
@@ -10,23 +10,23 @@ export const CanvasTrailCursor: React.FC<CanvasTrailCursorProps> = ({ containerR
   const pointsRef = useRef<{ x: number; y: number }[]>([]);
   const hueRef = useRef(200);
 
-  useCanvasCursor((ctx, { x, y }) => {
+  const draw = useCallback((ctx: CanvasRenderingContext2D, { x, y }: { x: number; y: number }) => {
     const points = pointsRef.current;
     points.push({ x, y });
     if (points.length > 40) points.shift();
 
     const dpr = window.devicePixelRatio || 1;
     ctx.clearRect(0, 0, ctx.canvas.width / dpr, ctx.canvas.height / dpr);
-
     if (points.length < 3) return;
 
     hueRef.current = (hueRef.current + 0.5) % 360;
     const hue = hueRef.current;
 
-    ctx.strokeStyle = `hsla(${hue}, 70%, 60%, 0.3)`;
-    ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+
+    ctx.strokeStyle = `hsla(${hue}, 80%, 60%, 0.25)`;
+    ctx.lineWidth = 5;
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
     for (let i = 1; i < points.length - 1; i++) {
@@ -36,8 +36,8 @@ export const CanvasTrailCursor: React.FC<CanvasTrailCursorProps> = ({ containerR
     }
     ctx.stroke();
 
-    ctx.strokeStyle = `hsla(${hue}, 70%, 50%, 0.15)`;
-    ctx.lineWidth = 4;
+    ctx.strokeStyle = `hsla(${(hue + 30) % 360}, 80%, 70%, 0.5)`;
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
     for (let i = 1; i < points.length - 1; i++) {
@@ -46,7 +46,8 @@ export const CanvasTrailCursor: React.FC<CanvasTrailCursorProps> = ({ containerR
       ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
     }
     ctx.stroke();
-  }, { containerRef });
+  }, []);
 
+  useCanvasCursor(draw as any, { containerRef });
   return null;
 };

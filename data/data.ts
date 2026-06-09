@@ -1,4 +1,8 @@
-import { smoothFollowerCode, clickRippleCode, textMorphCode, trailSnakeCode, fairyDustCode, rainbowCode, bubbleCode, characterCode, spotlightCode, springyCode, snowflakeCode, canvasTrailCode } from '@/components/codes';
+import {
+  smoothFollowerCode, clickRippleCode, textMorphCode, trailSnakeCode,
+  fairyDustCode, rainbowCode, bubbleCode, characterCode, spotlightCode,
+  glowCursorCode, sparkleTrailCode, snowflakeCode, canvasTrailCode,
+} from '@/components/codes';
 import { SmoothFollower } from '@/components/SmoothFollower';
 import { ClickRipple } from '@/components/ClickRipple';
 import { TextMorph } from '@/components/TextMorph';
@@ -8,7 +12,8 @@ import { RainbowCursor } from '@/components/RainbowCursor';
 import { BubbleCursor } from '@/components/BubbleCursor';
 import { CharacterCursor } from '@/components/CharacterCursor';
 import { SpotlightCursor } from '@/components/SpotlightCursor';
-import { SpringyCursor } from '@/components/SpringyCursor';
+import { GlowCursor } from '@/components/GlowCursor';
+import { SparkleTrail } from '@/components/SparkleTrail';
 import { SnowflakeCursor } from '@/components/SnowflakeCursor';
 import { CanvasTrailCursor } from '@/components/CanvasTrailCursor';
 
@@ -29,15 +34,23 @@ export const components: ComponentData[] = [
   {
     id: 'smooth-follower',
     title: 'Smooth Follower',
-    description: 'A glowing dot with pulsing rings that follows your cursor with smooth spring physics',
+    description: 'A glowing amber dot with pulsing rings that follows your cursor using spring physics. Smooth, responsive, and lightweight.',
     category: 'basic',
     CursorComponent: SmoothFollower,
     code: smoothFollowerCode,
   },
   {
+    id: 'sparkle-trail',
+    title: 'Sparkle Trail',
+    description: 'Tiny colorful glowing dots that trail behind your cursor like magical sparkles. Each sparkle fades with a soft glow.',
+    category: 'trails',
+    CursorComponent: SparkleTrail,
+    code: sparkleTrailCode,
+  },
+  {
     id: 'trail-snake',
     title: 'Trail Snake',
-    description: 'A colorful multi-dot trail with shadow glow that follows your mouse path',
+    description: 'A colorful multi-dot trail with glow effects that follows your mouse path. Each dot fades in size and opacity.',
     category: 'trails',
     CursorComponent: TrailSnake,
     code: trailSnakeCode,
@@ -45,7 +58,7 @@ export const components: ComponentData[] = [
   {
     id: 'click-ripple',
     title: 'Click Ripple',
-    description: 'Emits expanding colorful rings on every click with smooth fade animation',
+    description: 'Emits expanding colorful rings on every click. Each ripple has a random vibrant color with a soft glow effect.',
     category: 'interactive',
     CursorComponent: ClickRipple,
     code: clickRippleCode,
@@ -53,7 +66,7 @@ export const components: ComponentData[] = [
   {
     id: 'text-morph',
     title: 'Text Morph',
-    description: 'Expands into a gradient bubble revealing text when hovering over magnetic elements',
+    description: 'A small dot that expands into a gradient bubble with text when hovering over magnetic elements. Includes animated entrance and exit.',
     category: 'interactive',
     CursorComponent: TextMorph,
     code: textMorphCode,
@@ -61,7 +74,7 @@ export const components: ComponentData[] = [
   {
     id: 'fairy-dust',
     title: 'Fairy Dust',
-    description: 'Magical sparkle emoji particles trailing your cursor with gravity and fade effects',
+    description: 'Magical sparkle particles trailing your cursor with emoji characters, gravity, and fade effects. Canvas-based.',
     category: 'canvas',
     CursorComponent: FairyDustCursor,
     code: fairyDustCode,
@@ -69,7 +82,7 @@ export const components: ComponentData[] = [
   {
     id: 'rainbow',
     title: 'Rainbow Trail',
-    description: 'A vibrant multi-color segmented trail with continuous color cycling',
+    description: 'A vibrant multi-color segmented trail with continuous color cycling across the spectrum. Six parallel offset lines.',
     category: 'trails',
     CursorComponent: RainbowCursor,
     code: rainbowCode,
@@ -77,7 +90,7 @@ export const components: ComponentData[] = [
   {
     id: 'bubble',
     title: 'Bubble Cursor',
-    description: 'Floating translucent bubbles that drift upward from your cursor path',
+    description: 'Floating translucent blue bubbles that drift upward from your cursor with a subtle wobble. Includes bubble highlights.',
     category: 'canvas',
     CursorComponent: BubbleCursor,
     code: bubbleCode,
@@ -85,31 +98,31 @@ export const components: ComponentData[] = [
   {
     id: 'character',
     title: 'Character Cursor',
-    description: 'Radiating letters and symbols with rotation, scaling, and color effects',
+    description: 'Radiating letters, symbols, and decorative characters with rotation, scaling, and color effects. Canvas-based particle system.',
     category: 'effects',
     CursorComponent: CharacterCursor,
     code: characterCode,
   },
   {
+    id: 'glow-cursor',
+    title: 'Glow Cursor',
+    description: 'A large soft ambient glow that follows your cursor with a smooth, slowly shifting hue. Elegant, minimal, and mesmerizing.',
+    category: 'effects',
+    CursorComponent: GlowCursor,
+    code: glowCursorCode,
+  },
+  {
     id: 'spotlight',
     title: 'Spotlight',
-    description: 'Dark overlay with a bright smooth-following spotlight and purple glow',
+    description: 'A dark overlay with a smooth-following spotlight that reveals content beneath. Includes a purple glow effect.',
     category: 'effects',
     CursorComponent: SpotlightCursor,
     code: spotlightCode,
   },
   {
-    id: 'springy',
-    title: 'Springy Cursor',
-    description: 'Physics-based chain of bouncing dots with spring gravity and collision',
-    category: 'canvas',
-    CursorComponent: SpringyCursor,
-    code: springyCode,
-  },
-  {
     id: 'snowflake',
     title: 'Snowflake Cursor',
-    description: 'Gentle snowflakes falling from your cursor with drift and fade',
+    description: 'Gentle snowflakes falling from your cursor with horizontal drift, sinusoidal sway, and fade-out. White glowing particles.',
     category: 'effects',
     CursorComponent: SnowflakeCursor,
     code: snowflakeCode,
@@ -117,7 +130,7 @@ export const components: ComponentData[] = [
   {
     id: 'canvas-trail',
     title: 'Canvas Trail',
-    description: 'Smooth fluid bezier curve trail with dynamic hue cycling',
+    description: 'A smooth fluid bezier curve trail with dynamic hue cycling. Dual-layer rendering for depth with glow effects.',
     category: 'trails',
     CursorComponent: CanvasTrailCursor,
     code: canvasTrailCode,

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 
 interface CursorComponentProps {
@@ -12,17 +12,19 @@ interface TrailPoint {
 }
 
 const COLORS = ['#a78bfa', '#818cf8', '#6366f1', '#8b5cf6', '#7c3aed'];
+const TRAIL_LENGTH = 16;
 
 export const TrailSnake: React.FC<CursorComponentProps> = ({ containerRef }) => {
   const [trail, setTrail] = useState<TrailPoint[]>([]);
   const [isInside, setIsInside] = useState(false);
-  const trailLength = 16;
+  const trailRef = useRef<TrailPoint[]>([]);
+  const lastUpdateRef = useRef(0);
 
   useEffect(() => {
     const container = containerRef?.current;
     if (!container) return;
     const handleEnter = () => setIsInside(true);
-    const handleLeave = () => { setIsInside(false); setTrail([]); };
+    const handleLeave = () => { setIsInside(false); setTrail([]); trailRef.current = []; };
     container.addEventListener('mouseenter', handleEnter);
     container.addEventListener('mouseleave', handleLeave);
     return () => {
@@ -34,10 +36,15 @@ export const TrailSnake: React.FC<CursorComponentProps> = ({ containerRef }) => 
   useEffect(() => {
     if (!isInside) return;
     const handleMouseMove = (e: MouseEvent) => {
-      setTrail((prev) => {
-        const newTrail = [{ x: e.clientX, y: e.clientY }, ...prev];
-        return newTrail.slice(0, trailLength);
-      });
+      const now = performance.now();
+      if (now - lastUpdateRef.current < 16) {
+        trailRef.current = [{ x: e.clientX, y: e.clientY }, ...trailRef.current].slice(0, TRAIL_LENGTH);
+        return;
+      }
+      lastUpdateRef.current = now;
+      const newTrail = [{ x: e.clientX, y: e.clientY }, ...trailRef.current].slice(0, TRAIL_LENGTH);
+      trailRef.current = newTrail;
+      setTrail(newTrail);
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
@@ -46,7 +53,7 @@ export const TrailSnake: React.FC<CursorComponentProps> = ({ containerRef }) => 
   if (!isInside) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-50">
+    <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 9999 }}>
       {trail.map((point, index) => {
         const color = COLORS[index % COLORS.length];
         const size = Math.max(10 - index * 0.6, 2);
@@ -60,12 +67,12 @@ export const TrailSnake: React.FC<CursorComponentProps> = ({ containerRef }) => 
               width: size,
               height: size,
               background: color,
-              opacity: 1 - (index / trailLength),
-              boxShadow: `0 0 ${size}px ${color}60`,
+              opacity: 1 - (index / TRAIL_LENGTH),
+              boxShadow: `0 0 ${size * 1.5}px ${color}60`,
             }}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: 0.12 }}
           />
         );
       })}

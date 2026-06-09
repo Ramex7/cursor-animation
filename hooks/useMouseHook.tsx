@@ -1,8 +1,7 @@
-'use client'
-import {useEffect} from 'react';
+'use client';
+import { useEffect } from 'react';
 import { useSpring, useMotionValue, MotionValue } from 'framer-motion';
 
-//TYPE DEFINITIONS
 interface MouseOptions {
   damping?: number;
   stiffness?: number;
@@ -18,10 +17,10 @@ interface MouseReturn {
 
 export const useMouse = (options: MouseOptions = {}): MouseReturn => {
   const { damping = 0.15, stiffness = 150, mass = 0.5 } = options;
-  
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  
+
+  const mouseX = useMotionValue(typeof window !== 'undefined' ? window.innerWidth / 2 : 0);
+  const mouseY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 0);
+
   const springConfig = { damping, stiffness, mass };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
@@ -31,7 +30,6 @@ export const useMouse = (options: MouseOptions = {}): MouseReturn => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
     };
-
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [mouseX, mouseY]);
