@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nice Cursor
+
+A collection of interactive cursor animations and effects built with **React**, **Next.js**, **Framer Motion**, **TypeScript**, and **Tailwind CSS**. 12 unique cursor components with live preview, code viewing, and dark/light theme support.
+
+## Features
+
+- **12 Cursor Components** – Smooth followers, trails, ripples, canvas effects, and more
+- **Live Demo** – Try any cursor on the actual page before copying the code
+- **Search & Filter** – Find components by name, description, or category
+- **Code Viewer** – Inline code snippets with copy-to-clipboard
+- **Dark/Light Theme** – Full theme support with persistent preference
+- **Canvas Effects** – 5 performant canvas-based cursors (fairy dust, bubble, springy, etc.)
+- **Responsive** – Works on all screen sizes
+
+## Components
+
+| Component | Category | Type |
+|-----------|----------|------|
+| Smooth Follower | Basic | Framer Motion |
+| Click Ripple | Interactive | Framer Motion |
+| Text Morph | Interactive | Framer Motion |
+| Trail Snake | Trails | Framer Motion |
+| Fairy Dust | Canvas | Canvas API |
+| Rainbow Trail | Trails | Canvas API |
+| Bubble Cursor | Canvas | Canvas API |
+| Character Cursor | Effects | Canvas API |
+| Spotlight | Effects | Canvas API |
+| Springy Cursor | Canvas | Canvas API (physics) |
+| Snowflake Cursor | Effects | Canvas API |
+| Canvas Trail | Trails | Canvas API |
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the gallery.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [Next.js 16](https://nextjs.org/)
+- [React 19](https://react.dev/)
+- [Framer Motion 12](https://motion.dev/)
+- [Tailwind CSS 4](https://tailwindcss.com/)
+- [TypeScript](https://www.typescriptlang.org/)
 
-## Learn More
+## Usage
 
-To learn more about Next.js, take a look at the following resources:
+Each cursor component accepts a `containerRef` prop. To use one in your project:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```tsx
+'use client';
+import { useRef } from 'react';
+import { SmoothFollower } from '@/components/SmoothFollower';
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+export default function Page() {
+  const ref = useRef(null);
 
-## Deploy on Vercel
+  return (
+    <div ref={ref}>
+      <SmoothFollower containerRef={ref} />
+      {/* your content */}
+    </div>
+  );
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Credits
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Inspired by [Cursify](https://cursify.ui-layouts.com/) by Durgesh and Naymur.

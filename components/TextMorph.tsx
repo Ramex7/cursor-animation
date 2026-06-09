@@ -1,40 +1,33 @@
+'use client';
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMouse } from "@/hooks/useMouseHook";
-
-
-//TYPE DEFINITION
 
 interface CursorComponentProps {
   containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-
+const LABELS = ['CLICK', 'HOVER', '✨', '👆', '★'];
 
 export const TextMorph: React.FC<CursorComponentProps> = ({ containerRef }) => {
   const { smoothX, smoothY } = useMouse({ damping: 25, stiffness: 250 });
   const [isHovering, setIsHovering] = useState(false);
+  const [label, setLabel] = useState(LABELS[0]);
   const [isInside, setIsInside] = useState(false);
 
   useEffect(() => {
     const container = containerRef?.current;
     if (!container) return;
-
     const handleEnter = () => setIsInside(true);
-    const handleLeave = () => {
-      setIsInside(false);
-      setIsHovering(false);
-    };
-
+    const handleLeave = () => { setIsInside(false); setIsHovering(false); };
     const handleMouseMove = (e: MouseEvent) => {
-      const magnetic = (e.target as HTMLElement).closest('[data-magnetic]');
-      setIsHovering(!!magnetic);
+      const el = (e.target as HTMLElement).closest('[data-magnetic]');
+      setIsHovering(!!el);
+      if (el) setLabel(LABELS[Math.floor(Math.random() * LABELS.length)]);
     };
-
     container.addEventListener('mouseenter', handleEnter);
     container.addEventListener('mouseleave', handleLeave);
     container.addEventListener('mousemove', handleMouseMove);
-
     return () => {
       container.removeEventListener('mouseenter', handleEnter);
       container.removeEventListener('mouseleave', handleLeave);
@@ -46,32 +39,30 @@ export const TextMorph: React.FC<CursorComponentProps> = ({ containerRef }) => {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-50">
-      <motion.div
-        style={{ x: smoothX, y: smoothY }}
-        className="absolute"
-        animate={{
-          scale: isHovering ? 2 : 1,
-        }}
-        transition={{ type: "spring", damping: 15, stiffness: 300 }}
-      >
+      <motion.div style={{ x: smoothX, y: smoothY }} className="absolute">
         <div className="relative -translate-x-1/2 -translate-y-1/2">
           <motion.div
-            className="flex items-center justify-center bg-emerald-500 rounded-full"
+            className="flex items-center justify-center rounded-full overflow-hidden"
             animate={{
-              width: isHovering ? 80 : 12,
-              height: isHovering ? 80 : 12,
+              width: isHovering ? 96 : 14,
+              height: isHovering ? 96 : 14,
+              background: isHovering
+                ? 'linear-gradient(135deg, #10b981, #3b82f6)'
+                : '#10b981',
             }}
-            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            transition={{ type: "spring", damping: 18, stiffness: 260 }}
           >
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
               {isHovering && (
                 <motion.span
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.5 }}
-                  className="text-xs font-bold text-zinc-900"
+                  key={label}
+                  initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.3, rotate: 20 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-sm font-bold text-white select-none"
                 >
-                  CLICK
+                  {label}
                 </motion.span>
               )}
             </AnimatePresence>
